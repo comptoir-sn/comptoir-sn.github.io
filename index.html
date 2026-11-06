@@ -470,6 +470,11 @@ input[type=email],input[type=password]{width:100%;padding:12px 13px;border-radiu
 .auth-msg.ok{color:#9FE3C4}
 @media (min-width:900px){ .welcome.show .w-photo.short{height:100vh} .welcome.show .w-body{margin-top:12vh} }
 
+
+.w-photo.cover{height:64vh;min-height:380px;background:var(--ink)}
+.w-photo.cover img{object-position:center 0%}
+.w-photo.cover::after{background:linear-gradient(180deg,rgba(20,33,61,.6) 0%,rgba(20,33,61,0) 22%,rgba(20,33,61,0) 70%,var(--ink) 100%)}
+@media (min-width:900px){ .welcome.show .w-photo.cover{height:100vh} .w-photo.cover img{object-fit:contain;object-position:center} .w-photo.cover::after{background:linear-gradient(180deg,rgba(20,33,61,.6) 0%,rgba(20,33,61,0) 20%)} .w-photo.cover .w-top{left:calc(50% - 28vh + 20px)} }
 </style>
 </head>
 <body>
@@ -492,7 +497,7 @@ input[type=email],input[type=password]{width:100%;padding:12px 13px;border-radiu
 <div class="notif" id="notif" role="status" aria-live="polite"></div>
 
 
-<script src="config.js?v=1"></script>
-<script src="app.js?v=1"></script>
+<script src="config.js?v=2"></script>
+<script src="app.js?v=2"></script>
 </body>
 </html>

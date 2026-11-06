@@ -1232,7 +1232,7 @@ function authScreen(mode, msg, ok){
       <button class="btn mango block" type="button" id="retryBoot">Réessayer</button>`
   };
   const w = $('#welcome');
-  w.innerHTML = `<div class="w-photo short">${img(PHOTOS.hero.src,'Vendeuse qui répond à un message sur son téléphone')}<div class="w-top">${logo(true,36)}</div></div>
+  w.innerHTML = `<div class="w-photo short cover"><img src="cover.jpg" alt="Vendeuse de Comptoir qui suit ses ventes sur son téléphone" decoding="async"><div class="w-top">${logo(true,36)}</div></div>
     <div class="w-body">${F_[mode]}<p class="auth-msg${ok?' ok':''}" id="authMsg" role="alert">${esc(msg||'')}</p></div>`;
   w.classList.add('show');
   const first = w.querySelector('input'); if(first && !first.value) setTimeout(()=>first.focus(), 50);
