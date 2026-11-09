@@ -1438,6 +1438,7 @@ function payBox(inSheet){
     <div class="field"><label for="subPhone">Numéro qui a payé</label><input id="subPhone" name="phone" type="tel" placeholder="77 123 45 67" value="${esc(S?.shop?.whatsapp||'')}"></div>
     <p class="pb-err" id="subErr" hidden></p>
     <button class="btn mango block" type="submit">J’ai payé ${F(total)}</button>
+    <p class="pb-guar">🛡️ Satisfait ou remboursé le premier mois : préviens-nous sur WhatsApp et on te rend ton argent.</p>
     <p class="pb-note">Échéance le ${s.due_day||5} de chaque mois. On te prévient quelques jours avant.</p>
   </form>`;
 }
