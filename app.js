@@ -242,6 +242,10 @@ function errText(e){
   if(/email.*invalid|invalid.*email|validate email/i.test(m)) return 'Cet email n’est pas valide.';
   if(/NUMERO_INVALIDE/.test(m)) return 'Numéro invalide : 9 chiffres commençant par 70, 75, 76, 77 ou 78.';
   if(/NOM_REQUIS/.test(m)) return 'Donne un nom à ta boutique.';
+  if(/REFERENCE_REQUISE/.test(m)) return 'Recopie la référence reçue par SMS après le paiement.';
+  if(/TROP_DE_DEMANDES/.test(m)) return 'Trop d’essais. Attends un peu puis réessaie.';
+  if(/DEJA_TRAITE/.test(m)) return 'Ce paiement a déjà été traité.';
+  if(/INTERDIT/.test(m)) return 'Action réservée au patron de Comptoir.';
   if(/IMAGE_ILLISIBLE/.test(m)) return 'Cette image ne peut pas être lue.';
   if(/payload too large|exceeded the maximum|too large/i.test(m)) return 'Photo trop lourde (3 Mo maximum).';
   if(/JWT|session|not authenticated|NON_CONNECTE|refresh token/i.test(m)) return 'Ta session a expiré : reconnecte-toi.';
@@ -417,7 +421,7 @@ function topbar(){
   return `<div class="topbar">${logo(false,32)}<div class="topactions"><button class="iconbtn bell" data-bell aria-label="Notifications${u?`, ${u} non lues`:''}">${I.bell}${u?`<span class="badge">${u}</span>`:''}</button><button class="iconbtn" data-route="settings" aria-label="Réglages">${I.settings}</button></div></div>`;
 }
 function pagehead(title, sub){
-  return `<div class="pagehead"><div class="shop">${esc(S.shop.name)}</div><h1>${title}</h1>${sub?`<div class="sub">${sub}</div>`:''}</div>`;
+  return subBanner() + `<div class="pagehead"><div class="shop">${esc(S.shop.name)}</div><h1>${title}</h1>${sub?`<div class="sub">${sub}</div>`:''}</div>`;
 }
 function paymentsToday(){
   const r = {wave:0, om:0, cash:0};
@@ -589,6 +593,7 @@ function viewSettings(){
       <label class="check"><input type="checkbox" name="open" ${S.shop.open!==false?'checked':''}> Boutique ouverte aux commandes</label>
       <button class="btn" type="submit">Enregistrer</button>
     </form></div>
+  ${subCard()}
   <div class="card"><h2>Notifications</h2><p class="muted" style="margin-top:0">${notifState()}</p><button class="btn ghost" id="notifBtn">${I.bell} Activer les notifications</button></div>
   <div class="card"><h2>Zones et frais de livraison</h2>
     <p class="muted" style="margin-top:0">Ces frais s’ajoutent automatiquement à chaque commande. Mets tes vrais tarifs.</p>
@@ -1211,6 +1216,15 @@ document.addEventListener('click', e=>{
   const t = e.target.closest('button, a'); if(!t) return;
   if(t.closest('#notif')) $('#notif').classList.remove('show');
   if(t.dataset.sview){ return openStoreProduct(t.dataset.sview); }
+  if(t.hasAttribute('data-paysub')){ subMonths = 1; return openPaySheet(); }
+  if(t.hasAttribute('data-admin')) return openAdmin();
+  if(t.dataset.submonths){ subMonths = +t.dataset.submonths; return $('#sheet').classList.contains('show') ? openPaySheet() : paywall(); }
+  if(t.dataset.submode){ subPayMode = t.dataset.submode; return $('#sheet').classList.contains('show') ? openPaySheet() : paywall(); }
+  if(t.hasAttribute('data-subretry')){ SUB.pending = null; return $('#sheet').classList.contains('show') ? openPaySheet() : paywall(); }
+  if(t.dataset.copy){ try{ navigator.clipboard.writeText(t.dataset.copy); toast('Numéro copié'); }catch(e){} return; }
+  if(t.dataset.subok){ t.disabled = true; return adminAct('admin_decide_payment', {p_id:t.dataset.subok, p_ok:true}, 'Paiement validé, abonnement prolongé'); }
+  if(t.dataset.subko){ if(!confirm('Refuser ce paiement ?')) return; return adminAct('admin_decide_payment', {p_id:t.dataset.subko, p_ok:false}, 'Paiement refusé'); }
+  if(t.dataset.subplus){ if(!confirm('Ajouter 1 mois à cette boutique (paiement reçu en main propre) ?')) return; return adminAct('admin_extend', {p_shop:t.dataset.subplus, p_months:1}, '1 mois ajouté'); }
   if(t.id==='khNext'){ khGo(KH.i + 1); return; }
   if(t.dataset.khgo){ khGo(+t.dataset.khgo); return; }
   if(t.dataset.sinc){ const p = product(t.dataset.sinc); if(p){ cart[p.id] = Math.min(p.preorder ? 10 : p.stock, (cart[p.id]||0) + 1); if(t.hasAttribute('data-close-after')){ closeSheet(); toast('Ajouté au panier'); } renderStore(); } return; }
@@ -1243,6 +1257,7 @@ document.addEventListener('click', e=>{
 document.addEventListener('submit', e=>{
   const f = e.target;
   if(f.id==='authForm') return onAuth(e);
+  if(f.id==='subForm') return submitSub(e);
   if(f.id==='addDriver'){ e.preventDefault(); const d = Object.fromEntries(new FormData(f)); if(!phoneOk(d.phone)){ toast('Numéro invalide : 9 chiffres commençant par 7'); return; } S.drivers.push({id:uid(), name:d.name.trim(), phone:fmtPhone(d.phone), cash:0, remits:[]}); save(); render(); toast('Livreur ajouté'); }
   if(f.id==='addProduct'){ e.preventDefault(); const d = Object.fromEntries(new FormData(f)); const name=d.name.trim(); S.products.push({id:uid(), name, price:Number(d.price)||0, stock:Number(d.stock)||0, min:3, kw:[norm(name).split(' ')[0]], img:'', preorder:d.preorder==='on', delay:'15 à 20 jours', sort:S.products.reduce((a,p)=>Math.max(a,p.sort||0),0)+1}); save(); render(); toast('Produit ajouté'); }
   if(f.id==='shopForm'){ e.preventDefault(); const d = new FormData(f); const name = String(d.get('name')||'').trim();
@@ -1359,7 +1374,12 @@ async function afterLogin(user){
   try{
     const ok = await loadAll();
     if(!ok) return authScreen('shop');
+    await loadSub();
+    if(!SUB.active) return paywall();
     startApp();
+    setInterval(subWatch, 10 * 60 * 1000);
+    if(SUB.is_admin){ setTimeout(adminCheck, 1500); setInterval(adminCheck, 2 * 60 * 1000); }
+    setTimeout(subWatch, 1200);
   }catch(e){ console.warn(e); authScreen(isNetErr(e) ? 'offline' : 'login', isNetErr(e) ? '' : errText(e)); }
 }
 let started = false;
@@ -1379,6 +1399,121 @@ function startApp(){
 async function logout(){
   try{ if(pending) await flush(); await sb.auth.signOut(); }catch(e){}
   location.replace(baseUrl());
+}
+
+/* ===================== Abonnement Comptoir (9 900 F, échéance le 5) ===================== */
+let SUB = null, subTimer = null, subPayMode = 'om', subMonths = 1, adminSeen = -1;
+const MOIS = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+function dateFr(iso){ if(!iso) return ''; const d = new Date(iso); const k = new Date(d.getTime()); return `${k.getUTCDate()} ${MOIS[k.getUTCMonth()]} ${k.getUTCFullYear()}`; }
+function daysLeft(iso){ if(!iso) return -1; return Math.ceil((Date.parse(iso) - Date.now()) / 86400000); }
+async function loadSub(){ const {data, error} = await sb.rpc('my_subscription'); if(error) throw error; SUB = data; return SUB; }
+function subBanner(){
+  if(!SUB || SUB.exempt || !SUB.active) return '';
+  if(SUB.pending) return `<div class="subbar wait"><span>⏳ Paiement de ${F(SUB.pending.amount)} envoyé. On le vérifie, ton abonnement sera prolongé.</span></div>`;
+  const d = daysLeft(SUB.paid_until);
+  if(d > (SUB.notice_days || 5)) return '';
+  const when = d <= 0 ? 'aujourd’hui' : d === 1 ? 'demain' : `dans ${d} jours`;
+  return `<div class="subbar ${d<=1?'hot':''}"><span>🔔 Ton abonnement Comptoir se termine ${when} (${dateFr(SUB.paid_until)}). Paie avant pour ne pas être bloqué.</span><button class="btn small mango" data-paysub>Payer ${F(SUB.price)}</button></div>`;
+}
+function payBox(inSheet){
+  const s = SUB || {}, modes = [['om','Orange Money', s.om], ['wave','Wave', s.wave]].filter(m=>phoneOk(m[2]));
+  if(!modes.some(m=>m[0]===subPayMode)) subPayMode = (modes[0]||['om'])[0];
+  const num = (modes.find(m=>m[0]===subPayMode)||[])[2] || '';
+  const total = (s.price||9900) * subMonths;
+  if(s.pending) return `<div class="paybox">
+      <div class="pb-ok">⏳</div><h3>Paiement reçu, en cours de vérification</h3>
+      <p>${F(s.pending.amount)} par ${s.pending.mode==='wave'?'Wave':'Orange Money'} · référence <b>${esc(s.pending.ref)}</b>.<br>On vérifie et on active ton compte, en général en moins d’une heure. ${inSheet?'':'Cette page s’ouvre toute seule dès que c’est validé.'}</p>
+      ${phoneOk(s.whatsapp)?`<a class="btn ${inSheet?'':'mango'} block" target="_blank" rel="noopener" href="https://wa.me/221${phoneDigits(s.whatsapp)}?text=${encodeURIComponent(`Bonjour, je viens de payer mon abonnement Comptoir pour la boutique « ${s.shop_name||''} ». Montant : ${F(s.pending.amount)}. Référence : ${s.pending.ref}.`)}">Prévenir sur WhatsApp</a>`:''}
+      <button type="button" class="linkbtn" data-subretry>Je me suis trompé, refaire la déclaration</button>
+    </div>`;
+  return `<form id="subForm" class="paybox" novalidate>
+    ${s.refused?`<p class="pb-err">Le paiement avec la référence « ${esc(s.refused.ref)} » n’a pas été retrouvé. Vérifie le code et recommence.</p>`:''}
+    <div class="pb-months">${[1,3,6,12].map(m=>`<button type="button" class="${m===subMonths?'on':''}" data-submonths="${m}">${m} mois<small>${F((s.price||9900)*m)}</small></button>`).join('')}</div>
+    <ol class="pb-steps">
+      <li><b>Envoie ${F(total)}</b> par ${modes.length>1?`<span class="pb-modes">${modes.map(m=>`<button type="button" class="${m[0]===subPayMode?'on':''}" data-submode="${m[0]}">${m[1]}</button>`).join('')}</span>`:esc((modes[0]||['', 'Orange Money'])[1])} au <b class="num">${esc(num)}</b> <button type="button" class="linkbtn" data-copy="${esc(phoneDigits(num))}">copier</button>
+        ${subPayMode==='om'?`<br><a class="linkbtn" href="tel:%23144%23">Ouvrir Orange Money (#144#)</a>`:''}</li>
+      <li><b>Recopie la référence</b> reçue par SMS après le paiement.</li>
+    </ol>
+    <div class="field"><label for="subRef">Référence de la transaction</label><input id="subRef" name="ref" type="text" autocomplete="off" placeholder="Ex. : MP251109.1532.A12345"></div>
+    <div class="field"><label for="subPhone">Numéro qui a payé</label><input id="subPhone" name="phone" type="tel" placeholder="77 123 45 67" value="${esc(S?.shop?.whatsapp||'')}"></div>
+    <p class="pb-err" id="subErr" hidden></p>
+    <button class="btn mango block" type="submit">J’ai payé ${F(total)}</button>
+    <p class="pb-note">Échéance le ${s.due_day||5} de chaque mois. On te prévient quelques jours avant.</p>
+  </form>`;
+}
+function paywall(msg){
+  const s = SUB || {};
+  const w = $('#welcome');
+  const first = !s.paid_until;
+  w.innerHTML = `<div class="w-photo short cover"><img src="cover.jpg" alt="" decoding="async"><div class="w-top">${logo(true,36)}</div></div>
+    <div class="w-body pay">
+      <h1>${first?'Active ton <em>Comptoir.</em>':'Ton abonnement est <em>terminé.</em>'}</h1>
+      <p class="lead">${first?`Un seul prix, tout compris : <b>${F(s.price||9900)} par mois</b>. Paie une première fois pour ouvrir ta boutique.`:`Il s’est terminé le ${dateFr(s.paid_until)}. Ta boutique est fermée aux clients et tes données sont gardées : paie pour tout retrouver.`}</p>
+      ${payBox(false)}
+      ${msg?`<p class="auth-msg">${esc(msg)}</p>`:''}
+      <div class="auth-links">${s.is_admin?'':''}<button type="button" class="linkbtn" data-auth="logout">Me déconnecter</button></div>
+    </div>`;
+  w.classList.add('show');
+  clearInterval(subTimer);
+  subTimer = setInterval(async ()=>{
+    if(document.hidden) return;
+    try{ const was = !!(SUB && SUB.pending); await loadSub(); if(SUB.active){ clearInterval(subTimer); location.reload(); } else if(!!SUB.pending !== was) paywall(); }catch(e){}
+  }, 15000);
+}
+async function submitSub(e){
+  e.preventDefault();
+  const f = e.target, ref = f.ref.value.trim(), phone = f.phone.value.trim(), err = f.querySelector('#subErr');
+  const fail = m => { err.textContent = m; err.hidden = false; };
+  if(ref.length < 4) return fail('Recopie la référence reçue par SMS après le paiement.');
+  if(!phoneOk(phone)) return fail('Numéro invalide : 9 chiffres commençant par 70, 75, 76, 77 ou 78.');
+  const b = f.querySelector('button[type=submit]'); b.disabled = true;
+  const {data, error} = await sb.rpc('declare_subscription', {p_mode:subPayMode, p_ref:ref, p_phone:phoneDigits(phone), p_months:subMonths});
+  b.disabled = false;
+  if(error) return fail(errText(error));
+  SUB = data;
+  if(SUB.active){ toast('Paiement envoyé : on le vérifie'); closeSheet(); render(); } else paywall();
+}
+function openPaySheet(){ openSheet(sheetHead('Payer mon abonnement') + `<p class="muted" style="margin-top:0">${F(SUB.price)} par mois. Ton abonnement actuel va jusqu’au ${dateFr(SUB.paid_until)} : le paiement s’ajoute à la suite.</p>` + payBox(true)); }
+function subCard(){
+  if(!SUB) return '';
+  const st = SUB.exempt ? 'Offert (boutique du patron)' : SUB.active ? `Actif jusqu’au ${dateFr(SUB.paid_until)}` : 'Non payé';
+  return `<div class="card"><h2>Abonnement Comptoir</h2><p class="muted" style="margin-top:0">${esc(st)} · ${F(SUB.price)} par mois, échéance le ${SUB.due_day} de chaque mois.</p>
+    ${SUB.exempt?'':`<button class="btn mango" data-paysub>Payer mon abonnement</button>`}
+    ${SUB.is_admin?`<button class="btn" data-admin style="margin-left:8px">Gérer les abonnements</button>`:''}</div>`;
+}
+/* Espace patron */
+async function openAdmin(){
+  const {data, error} = await sb.rpc('admin_overview'); if(error) return toast(errText(error));
+  const A = data, now = Date.now();
+  const badge = sh => sh.exempt ? '<span class="ab ex">Offert</span>' : !sh.paid_until ? '<span class="ab no">Jamais payé</span>' : !sh.active ? '<span class="ab no">Bloqué</span>' : daysLeft(sh.paid_until) <= (SUB.notice_days||5) ? '<span class="ab soon">Bientôt</span>' : '<span class="ab ok">Actif</span>';
+  const remind = sh => { if(!phoneOk(sh.whatsapp)) return ''; const txt = sh.active ? `Bonjour, petit rappel : ton abonnement Comptoir pour « ${sh.name} » se termine le ${dateFr(sh.paid_until)}. Pense à payer ${F(SUB.price)} avant pour ne pas être bloqué. Merci !` : `Bonjour, ton abonnement Comptoir pour « ${sh.name} » n’est pas payé : ta boutique est fermée aux clients. Paie ${F(SUB.price)} depuis l’appli pour la rouvrir. Merci !`; return `<a class="btn small ghost" target="_blank" rel="noopener" href="https://wa.me/221${phoneDigits(sh.whatsapp)}?text=${encodeURIComponent(txt)}">Relancer</a>`; };
+  openSheet(sheetHead('Abonnements') + `
+    <h3 class="adm-h">Paiements à vérifier (${A.pending.length})</h3>
+    ${A.pending.length ? A.pending.map(p=>`<div class="adm-pay"><div><b>${esc(p.shop)}</b><div class="muted">${F(p.amount)} · ${p.months} mois · ${p.mode==='wave'?'Wave':'Orange Money'} · du ${esc(p.payer_phone)}</div><div>Référence : <b>${esc(p.ref)}</b></div><div class="muted" style="font-size:.8rem">${new Date(p.at).toLocaleString('fr-FR')}</div></div>
+        <div class="adm-act"><button class="btn small mango" data-subok="${p.id}">Valider</button><button class="btn small ghost" data-subko="${p.id}">Refuser</button></div></div>`).join('') : '<p class="muted">Rien à vérifier pour le moment.</p>'}
+    <p class="muted" style="font-size:.85rem">Avant de valider, vérifie dans ton Orange Money ou ton Wave que tu as bien reçu ce montant avec cette référence.</p>
+    <h3 class="adm-h">Boutiques (${A.shops.length})</h3>
+    ${A.shops.map(sh=>`<div class="adm-shop"><div><b>${esc(sh.name)}</b> ${badge(sh)}<div class="muted" style="font-size:.85rem">${esc(sh.email||'')}${sh.whatsapp?' · '+esc(sh.whatsapp):''}</div><div class="muted" style="font-size:.85rem">${sh.exempt?'Ne paie pas':sh.paid_until?'Payé jusqu’au '+dateFr(sh.paid_until):'Aucun paiement'}</div></div>
+      <div class="adm-act">${sh.exempt?'':remind(sh)}${sh.exempt?'':`<button class="btn small ghost" data-subplus="${sh.id}">+1 mois</button>`}</div></div>`).join('')}`);
+  adminSeen = A.pending.length;
+}
+async function adminAct(fn, args, okMsg){ const {error} = await sb.rpc(fn, args); if(error) return toast(errText(error)); toast(okMsg); openAdmin(); }
+async function adminCheck(){
+  if(!SUB || !SUB.is_admin) return;
+  try{ const {data} = await sb.rpc('admin_overview'); if(!data) return; const n = data.pending.length;
+    if(n > 0 && n !== adminSeen){ toast(`💰 ${n} paiement${n>1?'s':''} d’abonnement à vérifier`); if('Notification' in window && Notification.permission==='granted' && document.hidden){ try{ new Notification('Comptoir · abonnements', {body:`${n} paiement${n>1?'s':''} à vérifier`}); }catch(e){} } }
+    adminSeen = n; }catch(e){}
+}
+async function subWatch(){
+  try{ await loadSub(); }catch(e){ return; }
+  if(!SUB.active){ paywall(); return; }
+  const d = daysLeft(SUB.paid_until);
+  if(!SUB.exempt && !SUB.pending && d >= 0 && d <= (SUB.notice_days||5)){
+    const key = 'comptoir-rappel-' + new Date().toDateString();
+    let shown = false; try{ shown = !!localStorage.getItem(key); localStorage.setItem(key, '1'); }catch(e){}
+    if(!shown){ toast(`🔔 Ton abonnement se termine le ${dateFr(SUB.paid_until)}`); try{ if('Notification' in window && Notification.permission==='granted'){ new Notification('Comptoir', {body:`Ton abonnement se termine le ${dateFr(SUB.paid_until)}. Paie ${F(SUB.price)} pour ne pas être bloqué.`}); } }catch(e){} }
+  }
+  render();
 }
 
 /* ===================== Démarrage ===================== */

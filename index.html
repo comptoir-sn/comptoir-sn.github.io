@@ -571,6 +571,32 @@ body.storefront .btn.small{background:#17122B;border-radius:999px}
   body.storefront .sf-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
 @media (prefers-reduced-motion:reduce){.kh-item.on .kh-card{animation:none}}
+
+/* ---- Abonnement ---- */
+.subbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:#FFF0E3;border:1px solid #FFD3B0;color:#7A3A06;border-radius:14px;padding:12px 14px;margin:0 0 14px;font-weight:600;font-size:.92rem}
+.subbar.hot{background:#FDE9EA;border-color:#F5B5B8;color:#8A1C22}
+.subbar.wait{background:#E7EEFD;border-color:#BCD0F7;color:#1D3E8A}
+.w-body.pay h1{margin-bottom:8px}
+.paybox{background:#fff;color:var(--ink);border-radius:20px;padding:18px;margin:14px 0 6px;display:grid;gap:10px}
+.paybox h3{margin:0;font-size:1.15rem}.paybox p{margin:0;color:var(--ink-2)}
+.paybox .pb-ok{font-size:2rem}
+.paybox .linkbtn{color:var(--ink);padding:2px 0}
+.pb-months{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.pb-months button,.pb-modes button{appearance:none;border:1.5px solid var(--line);background:#fff;border-radius:12px;padding:8px 4px;font:inherit;font-weight:700;cursor:pointer;color:var(--ink);display:grid;gap:2px;text-align:center}
+.pb-months small{font-weight:600;color:var(--ink-3);font-size:.72rem}
+.pb-months button.on,.pb-modes button.on{border-color:var(--ink);background:var(--ink);color:#fff}
+.pb-months button.on small{color:#C9CFE0}
+.pb-modes{display:inline-flex;gap:6px;vertical-align:middle}.pb-modes button{padding:4px 10px;display:inline-block}
+.pb-steps{margin:4px 0;padding-left:20px;display:grid;gap:8px;color:var(--ink-2)}
+.pb-steps b{color:var(--ink)}
+.pb-err{color:#B42318!important;font-weight:600}
+.pb-note{font-size:.82rem;color:var(--ink-3)!important;text-align:center}
+.paybox input{width:100%;padding:12px 13px;border-radius:14px;border:1px solid var(--line);font-size:1rem}
+.adm-h{margin:18px 0 8px;font-size:1rem}
+.adm-pay,.adm-shop{display:flex;justify-content:space-between;gap:12px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px;flex-wrap:wrap}
+.adm-act{display:flex;gap:6px;flex-wrap:wrap}
+.ab{display:inline-block;font-size:.72rem;font-weight:700;border-radius:999px;padding:3px 8px;margin-left:6px;vertical-align:middle}
+.ab.ok{background:#E3F5EC;color:#137A50}.ab.soon{background:#FFF0E3;color:#B4530A}.ab.no{background:#FDE9EA;color:#B42318}.ab.ex{background:#EFEBFC;color:#5B3FD0}
 </style>
 </head>
 <body>
@@ -594,6 +620,6 @@ body.storefront .btn.small{background:#17122B;border-radius:999px}
 
 
 <script src="config.js?v=2"></script>
-<script src="app.js?v=4"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>
