@@ -598,6 +598,23 @@ body.storefront .btn.small{background:#17122B;border-radius:999px}
 .adm-act{display:flex;gap:6px;flex-wrap:wrap}
 .ab{display:inline-block;font-size:.72rem;font-weight:700;border-radius:999px;padding:3px 8px;margin-left:6px;vertical-align:middle}
 .ab.ok{background:#E3F5EC;color:#137A50}.ab.soon{background:#FFF0E3;color:#B4530A}.ab.no{background:#FDE9EA;color:#B42318}.ab.ex{background:#EFEBFC;color:#5B3FD0}
+.pbars{display:flex;align-items:flex-end;gap:10px;height:200px;margin-top:10px}
+.pbars.small{height:110px}
+.pb-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;height:100%}
+.pb-col i{display:block;width:100%;max-width:46px;border-radius:10px 10px 4px 4px;background:#C9D4F2;transform-origin:bottom;animation:pbgrow .9s cubic-bezier(.2,.8,.2,1) both}
+.pb-col i.hot{background:var(--mango,#FF7A1A)}.pb-col i.sig{background:#BFE8D3}
+.pb-v{font-size:.72rem;font-weight:700;color:var(--ink-2,#4B556B);white-space:nowrap}
+.pb-l{font-size:.78rem;color:var(--ink-3,#8A90A0)}
+@keyframes pbgrow{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@media (prefers-reduced-motion:reduce){.pb-col i{animation:none}}
+.pact{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pact div{background:var(--sable,#F7F1E8);border-radius:16px;padding:14px}
+.pact b{display:block;font-size:1.5rem;font-weight:800;letter-spacing:-.02em}
+.pact span{color:var(--ink-2,#4B556B);font-size:.85rem}
+.ptop{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line,#EADFCF)}
+.ptop span{width:26px;height:26px;border-radius:50%;background:var(--ink,#14213D);color:#fff;display:grid;place-items:center;font-size:.8rem;font-weight:800}
+.ptop em{font-style:normal;color:var(--ink-2,#4B556B);font-size:.85rem}
+.iconbtn.patron{font-size:1.15rem}
 </style>
 </head>
 <body>
@@ -621,6 +638,6 @@ body.storefront .btn.small{background:#17122B;border-radius:999px}
 
 
 <script src="config.js?v=2"></script>
-<script src="app.js?v=7"></script>
+<script src="app.js?v=8"></script>
 </body>
 </html>

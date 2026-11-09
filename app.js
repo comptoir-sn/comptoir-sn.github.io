@@ -412,13 +412,13 @@ function go(r, f){ route = r; if(f) filter = f; try{ history.replaceState(null,'
 function render(){
   nav();
   const v = $('#view');
-  v.innerHTML = topbar() + (route==='today' ? viewToday() : route==='orders' ? viewOrders() : route==='drivers' ? viewDrivers() : route==='products' ? viewProducts() : viewSettings());
+  v.innerHTML = topbar() + (route==='today' ? viewToday() : route==='orders' ? viewOrders() : route==='drivers' ? viewDrivers() : route==='products' ? viewProducts() : route==='patron' ? viewPatron() : viewSettings());
   if(route==='orders'){ const s=$('#q'); if(s){ s.value=query; s.addEventListener('input', e=>{ query=e.target.value; $('#olist').innerHTML = ordersList(); }); } }
   document.querySelectorAll('[data-count]').forEach(countUp);
 }
 function topbar(){
   const u = unreadCount();
-  return `<div class="topbar">${logo(false,32)}<div class="topactions"><button class="iconbtn bell" data-bell aria-label="Notifications${u?`, ${u} non lues`:''}">${I.bell}${u?`<span class="badge">${u}</span>`:''}</button><button class="iconbtn" data-route="settings" aria-label="Réglages">${I.settings}</button></div></div>`;
+  return `<div class="topbar">${logo(false,32)}<div class="topactions"><button class="iconbtn bell" data-bell aria-label="Notifications${u?`, ${u} non lues`:''}">${I.bell}${u?`<span class="badge">${u}</span>`:''}</button>${SUB&&SUB.is_admin?`<button class="iconbtn patron" data-route="patron" aria-label="Tableau de bord du patron">👑</button>`:''}<button class="iconbtn" data-route="settings" aria-label="Réglages">${I.settings}</button></div></div>`;
 }
 function pagehead(title, sub){
   return subBanner() + `<div class="pagehead"><div class="shop">${esc(S.shop.name)}</div><h1>${title}</h1>${sub?`<div class="sub">${sub}</div>`:''}</div>`;
@@ -1218,6 +1218,7 @@ document.addEventListener('click', e=>{
   if(t.dataset.sview){ return openStoreProduct(t.dataset.sview); }
   if(t.hasAttribute('data-paysub')){ subMonths = 1; return openPaySheet(); }
   if(t.hasAttribute('data-admin')) return openAdmin();
+  if(t.hasAttribute('data-preload')){ $('#patron').innerHTML='<div class="card"><p class="muted" style="margin:0">Actualisation…</p></div>'; return loadPatron(true); }
   if(t.dataset.submonths){ subMonths = +t.dataset.submonths; return $('#sheet').classList.contains('show') ? openPaySheet() : paywall(); }
   if(t.dataset.submode){ subPayMode = t.dataset.submode; return $('#sheet').classList.contains('show') ? openPaySheet() : paywall(); }
   if(t.hasAttribute('data-subretry')){ SUB.pending = null; return $('#sheet').classList.contains('show') ? openPaySheet() : paywall(); }
@@ -1480,7 +1481,7 @@ function subCard(){
   const st = SUB.exempt ? 'Offert (boutique du patron)' : SUB.active ? `Actif jusqu’au ${dateFr(SUB.paid_until)}` : 'Non payé';
   return `<div class="card"><h2>Abonnement Comptoir</h2><p class="muted" style="margin-top:0">${esc(st)} · ${F(SUB.price)} par mois, échéance le ${SUB.due_day} de chaque mois.</p>
     ${SUB.exempt?'':`<button class="btn mango" data-paysub>Payer mon abonnement</button>`}
-    ${SUB.is_admin?`<button class="btn" data-admin style="margin-left:8px">Gérer les abonnements</button>`:''}</div>`;
+    ${SUB.is_admin?`<button class="btn" data-admin style="margin-left:8px">Gérer les abonnements</button><button class="btn ghost" data-route="patron" style="margin-left:8px">👑 Tableau de bord</button>`:''}</div>`;
 }
 /* Espace patron */
 async function openAdmin(){
@@ -1498,7 +1499,7 @@ async function openAdmin(){
       <div class="adm-act">${sh.exempt?'':remind(sh)}${sh.exempt?'':`<button class="btn small ghost" data-subplus="${sh.id}">+1 mois</button>`}</div></div>`).join('')}`);
   adminSeen = A.pending.length;
 }
-async function adminAct(fn, args, okMsg){ const {error} = await sb.rpc(fn, args); if(error) return toast(errText(error)); toast(okMsg); openAdmin(); }
+async function adminAct(fn, args, okMsg){ const {error} = await sb.rpc(fn, args); if(error) return toast(errText(error)); toast(okMsg); openAdmin(); pstatAt = 0; if(route==='patron') loadPatron(true); }
 async function adminCheck(){
   if(!SUB || !SUB.is_admin) return;
   try{ const {data} = await sb.rpc('admin_overview'); if(!data) return; const n = data.pending.length;
@@ -1517,6 +1518,65 @@ async function subWatch(){
   render();
 }
 
+/* ===================== Tableau de bord du patron ===================== */
+let PSTAT = null, pstatAt = 0;
+const MOIS_C = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+function viewPatron(){
+  if(!SUB || !SUB.is_admin){ route = 'today'; return viewToday(); }
+  if(!PSTAT || Date.now() - pstatAt > 60000) loadPatron();
+  return pagehead('Tableau de bord du patron', 'Comptoir, ton entreprise en un coup d’œil') + `<div id="patron">${PSTAT ? patronBody(PSTAT) : '<div class="card"><p class="muted" style="margin:0">Chargement des chiffres…</p></div>'}</div>`;
+}
+async function loadPatron(force){
+  if(force) pstatAt = 0;
+  try{
+    const {data, error} = await sb.rpc('admin_stats'); if(error) throw error;
+    PSTAT = data; pstatAt = Date.now();
+    const box = $('#patron'); if(box && route==='patron'){ box.innerHTML = patronBody(PSTAT); box.querySelectorAll('[data-count]').forEach(countUp); }
+  }catch(e){ const box = $('#patron'); if(box) box.innerHTML = `<div class="card"><p style="margin:0">${esc(errText(e))}</p><button class="btn small" data-preload style="margin-top:10px">Réessayer</button></div>`; }
+}
+function patronBody(d){
+  const mrr = d.active_paying * d.price;
+  const maxRev = Math.max(d.price, ...d.months.map(m=>m.revenue));
+  const maxSig = Math.max(1, ...d.months.map(m=>m.signups));
+  const lab = m => MOIS_C[+m.m.slice(5,7)-1];
+  const bars = d.months.map((m,i)=>{ const h = Math.round(150*m.revenue/maxRev); const last = i===d.months.length-1;
+    return `<div class="pb-col"><span class="pb-v">${m.revenue? F(m.revenue).replace(' F','') : ''}</span><i style="height:${Math.max(4,h)}px" class="${last?'hot':''}"></i><span class="pb-l">${lab(m)}</span></div>`; }).join('');
+  const sig = d.months.map(m=>`<div class="pb-col"><span class="pb-v">${m.signups||''}</span><i style="height:${Math.max(4,Math.round(60*m.signups/maxSig))}px" class="sig"></i><span class="pb-l">${lab(m)}</span></div>`).join('');
+  const remind = sh => { if(!phoneOk(sh.whatsapp)) return ''; const txt = `Bonjour, petit rappel : ton abonnement Comptoir pour « ${sh.name} » se termine le ${dateFr(sh.paid_until)}. Pense à payer ${F(d.price)} avant pour ne pas être bloqué. Merci !`; return `<a class="btn small ghost" target="_blank" rel="noopener" href="https://wa.me/221${phoneDigits(sh.whatsapp)}?text=${encodeURIComponent(txt)}">Relancer</a>`; };
+  return `
+  <div class="dash">
+    <div class="grid">
+      <div class="hero">
+        <div class="blob" aria-hidden="true"></div>
+        <div class="label">Encaissé ce mois-ci (abonnements)</div>
+        <div class="big num" data-count="${d.revenue_month}">${F(d.revenue_month)}</div>
+        <div class="chipsrow">
+          <span class="mchip">Revenu mensuel garanti<b class="num">${F(mrr)}</b></span>
+          <span class="mchip">Total depuis le début<b class="num">${F(d.revenue_total)}</b></span>
+        </div>
+      </div>
+      ${d.pending_count ? `<button class="btn mango block" data-admin>💰 ${d.pending_count} paiement${d.pending_count>1?'s':''} à vérifier · ${F(d.pending_amount)}</button>` : `<button class="btn block" data-admin>Gérer les abonnements</button>`}
+      <div class="kpis">
+        <button class="kpi" data-admin><span class="ic" style="background:#E3F5EC;color:#137A50">${I.check||'✓'}</span><b class="num">${d.active_paying}</b><span>Abonnés actifs</span></button>
+        <button class="kpi" data-admin><span class="ic" style="background:var(--mango-soft);color:var(--mango-ink)">${I.clock}</span><b class="num">${d.expiring.length}</b><span>Échéance sous 7 jours</span></button>
+        <button class="kpi" data-admin><span class="ic" style="background:var(--red-soft);color:var(--red)">${I.alert}</span><b class="num">${d.blocked + d.never_paid}</b><span>Bloqués ou jamais payé</span></button>
+        <button class="kpi" data-admin><span class="ic" style="background:var(--indigo-soft);color:var(--indigo)">${I.drivers}</span><b class="num">${d.new_month}</b><span>Nouveaux ce mois</span></button>
+      </div>
+    </div>
+    <div class="grid">
+      <div class="card"><h2>Revenus des abonnements</h2><p class="muted" style="margin-top:0">Les 6 derniers mois, paiements validés</p><div class="pbars">${bars}</div></div>
+      <div class="card"><h2>Nouvelles boutiques</h2><div class="pbars small">${sig}</div>
+        <p class="muted" style="margin-bottom:0">${d.shops_total} boutique${d.shops_total>1?'s':''} inscrite${d.shops_total>1?'s':''} au total.</p></div>
+      <div class="card"><h2>Échéances à venir</h2>
+        ${d.expiring.length ? d.expiring.map(sh=>`<div class="adm-shop"><div><b>${esc(sh.name)}</b><div class="muted" style="font-size:.85rem">Fin le ${dateFr(sh.paid_until)} · dans ${daysLeft(sh.paid_until)} j</div></div><div class="adm-act">${remind(sh)}</div></div>`).join('') : '<p class="muted" style="margin:0">Aucune échéance dans les 7 prochains jours.</p>'}</div>
+      <div class="card"><h2>Activité de tes vendeurs</h2><p class="muted" style="margin-top:0">Ce mois-ci, sur toutes les boutiques Comptoir</p>
+        <div class="pact"><div><b class="num">${d.orders_month}</b><span>commandes passées</span></div><div><b class="num">${F(d.gmv_month)}</b><span>de ventes générées</span></div></div>
+        ${d.top_shops.length ? `<h3 class="adm-h">Boutiques les plus actives</h3>` + d.top_shops.map((s,i)=>`<div class="ptop"><span>${i+1}</span><b>${esc(s.name)}</b><em>${s.orders} cmd · ${F(s.sales)}</em></div>`).join('') : ''}
+      </div>
+      <button class="btn ghost block" data-preload>Actualiser les chiffres</button>
+    </div>
+  </div>`;
+}
 /* ===================== Démarrage ===================== */
 const LIBS = ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.93.0/dist/umd/supabase.js',
               'https://unpkg.com/@supabase/supabase-js@2.93.0/dist/umd/supabase.js'];
