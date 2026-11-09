@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Comptoir · Vos commandes en ligne, sous contrôle</title>
+<meta name="description" content="Comptoir aide les vendeurs en ligne au Sénégal à gérer leurs commandes WhatsApp, leurs livraisons et leurs paiements Wave, Orange Money et cash au même endroit.">
+<meta property="og:title" content="Comptoir · Vos commandes en ligne, sous contrôle">
+<meta property="og:description" content="Commandes WhatsApp, boutique en ligne, livreurs et paiements : tout au même endroit, sur ton téléphone.">
+<meta property="og:image" content="https://comptoir-sn.github.io/lp/partage.jpg">
+<meta name="theme-color" content="#14213D">
+<link rel="icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400..800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#14213D;--ink-2:#4B556B;--ink-3:#8A90A0;--saf:#FF7A1A;--saf-2:#EE6A0B;--saf-soft:#FFF0E3;--sable:#F7F1E8;--cream:#FFFCF7;--line:#EADFCF;--mint:#1FA971}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+img{max-width:100%;display:block}
+.serif{font-family:"Instrument Serif",Georgia,serif;font-weight:400;letter-spacing:-.01em}
+.serif em{font-style:italic;color:var(--saf)}
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+.kick{display:inline-flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--saf-2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;text-decoration:none;font-weight:700;border-radius:999px;padding:15px 26px;font-size:1rem;transition:transform .2s ease,background .2s ease,box-shadow .2s ease;white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn.saf{background:var(--saf);color:#fff;box-shadow:0 14px 30px -14px rgba(255,122,26,.9)}
+.btn.saf:hover{background:var(--saf-2)}
+.btn.ink{background:var(--ink);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+.btn .arr{font-size:1.1em;line-height:1}
+/* bandeau */
+.announce{background:var(--ink);color:#fff;font-size:.88rem;text-align:center;padding:9px 16px}
+.announce a{color:var(--saf);font-weight:700;margin-left:6px}
+/* entête */
+header{position:sticky;top:0;z-index:20;background:rgba(255,252,247,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid transparent;transition:border-color .3s}
+header.scrolled{border-color:var(--line)}
+.hd{display:flex;align-items:center;justify-content:space-between;height:66px}
+.logo{display:inline-flex;align-items:center;gap:9px;text-decoration:none;font-weight:800;font-size:1.32rem;letter-spacing:-.03em}
+.logo svg{flex:0 0 auto}
+.nav{display:flex;align-items:center;gap:6px}
+.nav a.l{display:none;text-decoration:none;font-weight:600;color:var(--ink-2);padding:8px 12px;border-radius:999px}
+.nav a.l:hover{color:var(--ink);background:var(--sable)}
+.nav .btn{padding:10px 18px;font-size:.92rem}
+.nav .login{text-decoration:none;font-weight:700;padding:10px 12px;white-space:nowrap}
+@media (max-width:420px){.nav .login{display:none}}
+/* hero */
+.hero{position:relative;overflow:hidden;padding:44px 0 0}
+.hero-grid{display:grid;gap:34px}
+.hero h1{font-size:clamp(2.9rem,11vw,5.6rem);line-height:.98;margin:16px 0 18px}
+.hero p.lead{font-size:1.12rem;color:var(--ink-2);max-width:34ch;margin:0 0 26px}
+.ctas{display:flex;flex-wrap:wrap;gap:12px}
+.trust{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:22px;color:var(--ink-2);font-size:.92rem;font-weight:600}
+.trust span{display:inline-flex;align-items:center;gap:7px}
+.trust i{width:8px;height:8px;border-radius:50%;background:var(--mint);display:inline-block}
+.phones{position:relative;height:500px;margin:0 -20px}
+.phone{position:absolute;width:236px;border-radius:38px;padding:9px;background:#0E1626;box-shadow:0 50px 80px -40px rgba(20,33,61,.55),0 0 0 1px rgba(255,255,255,.06) inset}
+.phone img{border-radius:30px;width:100%;aspect-ratio:390/844;object-fit:cover;object-position:top}
+.phone.p1{left:50%;top:8px;transform:translateX(-50%);z-index:3;animation:flo 7s ease-in-out infinite}
+.phone.p2{left:calc(50% - 250px);top:60px;transform:rotate(-8deg) scale(.86);z-index:2;opacity:.98}
+.phone.p3{left:calc(50% + 14px);top:60px;transform:rotate(8deg) scale(.86);z-index:1;opacity:.98}
+@keyframes flo{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-12px)}}
+.blob{position:absolute;border-radius:50%;filter:blur(2px);z-index:0}
+.blob.b1{width:340px;height:340px;background:var(--saf);right:-120px;top:640px;opacity:.95}
+.blob.b2{width:260px;height:260px;background:var(--sable);left:-110px;top:760px}
+.hero-dock{position:relative;z-index:4;height:90px;margin-top:-90px;background:linear-gradient(180deg,rgba(255,252,247,0),var(--cream) 80%)}
+/* chiffres */
+.facts{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:26px 0 0}
+.fact{background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px}
+.fact b{display:block;font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:2.2rem;line-height:1;margin-bottom:6px}
+.fact span{color:var(--ink-2);font-size:.92rem}
+/* sections */
+section.pad{padding:84px 0}
+h2.serif{font-size:clamp(2.4rem,8vw,4rem);line-height:1;margin:14px 0 16px}
+.sub{color:var(--ink-2);font-size:1.08rem;max-width:44ch;margin:0}
+/* pourquoi */
+.why{display:grid;gap:34px}
+.feats{border-top:1px solid var(--line);margin-top:10px}
+.feat{display:grid;grid-template-columns:48px 1fr;gap:16px;padding:22px 0;border-bottom:1px solid var(--line)}
+.feat .ic{width:48px;height:48px;border-radius:14px;background:var(--saf-soft);display:grid;place-items:center;color:var(--saf-2)}
+.feat h3{margin:2px 0 6px;font-size:1.28rem;letter-spacing:-.01em}
+.feat p{margin:0;color:var(--ink-2)}
+.shot-card{background:var(--sable);border-radius:34px;padding:34px 20px 0;overflow:hidden;position:relative}
+.shot-card .phone{position:relative;margin:0 auto;left:auto;top:auto;transform:none;width:250px;border-radius:38px 38px 0 0;padding:9px 9px 0}
+.shot-card .phone img{border-radius:30px 30px 0 0;aspect-ratio:390/700}
+.shot-card .badge{position:absolute;z-index:2;background:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 20px 40px -20px rgba(20,33,61,.4);font-size:.86rem;font-weight:600;display:flex;gap:10px;align-items:center}
+.shot-card .badge b{display:block;font-size:1rem}
+.shot-card .badge .dot{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:800;flex:0 0 auto}
+.shot-card .bd1{left:14px;top:120px}.shot-card .bd2{right:14px;top:300px}
+/* comment */
+.how{background:var(--sable);position:relative;overflow:hidden}
+.how::before{content:"";position:absolute;inset:0;background-image:radial-gradient(rgba(20,33,61,.07) 1.2px,transparent 1.3px);background-size:22px 22px;pointer-events:none}
+.steps{display:grid;gap:14px;margin-top:34px;position:relative}
+.step{background:#fff;border-radius:26px;padding:26px;border:1px solid var(--line)}
+.step .n{font-family:"Instrument Serif",Georgia,serif;font-size:2.6rem;line-height:1;color:var(--saf)}
+.step h3{margin:10px 0 6px;font-size:1.2rem}
+.step p{margin:0;color:var(--ink-2)}
+/* bande cta */
+.band{background:var(--ink);color:#fff;border-radius:34px;padding:46px 28px;position:relative;overflow:hidden;text-align:center}
+.band::after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;background:var(--saf);right:-90px;top:-110px}
+.band h3{position:relative;z-index:1;font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:clamp(2.2rem,7vw,3.4rem);line-height:1.02;margin:0 0 12px}
+.band p{position:relative;z-index:1;color:#C9CFE0;margin:0 0 24px}
+.band .btn{position:relative;z-index:1}
+/* tarifs */
+.plans{display:grid;gap:16px;margin-top:36px}
+.plan{background:#fff;border:1px solid var(--line);border-radius:30px;padding:30px;display:flex;flex-direction:column}
+.plan.pro{background:var(--ink);color:#fff;border-color:var(--ink);position:relative;overflow:hidden}
+.plan h3{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:2.3rem;margin:0}
+.plan .d{color:var(--ink-2);margin:4px 0 18px}
+.plan.pro .d{color:#C9CFE0}
+.price{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.price b{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:3.6rem;line-height:1}
+.price s{color:var(--ink-3)}
+.plan.pro .price s{color:#8E97AE}
+.tag{display:inline-block;background:var(--saf);color:#fff;font-weight:700;font-size:.78rem;border-radius:999px;padding:6px 12px;margin-bottom:14px;align-self:flex-start}
+.plan ul{list-style:none;padding:0;margin:22px 0 26px;display:grid;gap:10px;flex:1}
+.plan li{display:grid;grid-template-columns:22px 1fr;gap:8px}
+.plan li::before{content:"✓";font-weight:800;color:var(--mint)}
+.plan.pro li::before{color:var(--saf)}
+.note{color:var(--ink-3);font-size:.86rem;margin-top:14px}
+/* exemple */
+.case{display:grid;gap:26px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:34px;padding:30px;overflow:hidden}
+.case .phone{position:relative;left:auto;top:auto;transform:none;width:240px;margin:0 auto}
+.case blockquote{margin:0;font-family:"Instrument Serif",Georgia,serif;font-size:clamp(1.8rem,5vw,2.5rem);line-height:1.08}
+.case .who{margin-top:16px;color:var(--ink-2)}
+/* faq */
+.faq{margin-top:30px;border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line);padding:4px 0}
+.faq summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:16px;align-items:center;padding:18px 0;font-weight:700;font-size:1.08rem}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";font-size:1.6rem;font-weight:400;color:var(--saf-2);transition:transform .25s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq p{margin:0 0 20px;color:var(--ink-2);max-width:62ch}
+/* fin */
+.closing{text-align:center;background:var(--sable);position:relative;overflow:hidden}
+.closing h2{font-size:clamp(2.8rem,10vw,5.4rem)}
+.closing .ctas{justify-content:center;margin-top:28px}
+footer{background:var(--ink);color:#C9CFE0;padding:60px 0 34px;font-size:.95rem}
+.fgrid{display:grid;gap:30px}
+footer .logo{color:#fff}
+footer h4{color:#fff;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;margin:0 0 12px}
+footer ul{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+footer a{text-decoration:none;color:#C9CFE0}
+footer a:hover{color:#fff}
+.copy{border-top:1px solid rgba(255,255,255,.1);margin-top:40px;padding-top:20px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;color:#8E97AE;font-size:.86rem}
+/* apparition */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .8s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.rv.in{opacity:1;transform:none}
+.rv.d1{transition-delay:.08s}.rv.d2{transition-delay:.16s}.rv.d3{transition-delay:.24s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}html{scroll-behavior:auto}}
+@media (min-width:760px){
+  .facts{grid-template-columns:repeat(4,1fr)}
+  .steps{grid-template-columns:repeat(2,1fr)}
+  .plans{grid-template-columns:1fr 1fr;max-width:900px}
+  .fgrid{grid-template-columns:1.4fr 1fr 1fr 1fr}
+}
+@media (min-width:980px){
+  .nav a.l{display:inline-block}
+  .hero{padding-top:70px}
+  .hero-grid{grid-template-columns:1.05fr 1fr;align-items:center}
+  .phones{height:600px;margin:0}
+  .phone.p1{width:270px}
+  .blob.b1{width:470px;height:470px;right:-60px;top:80px}
+  .blob.b2{top:280px;left:-90px}
+  .why{grid-template-columns:1fr 1fr;align-items:center;gap:70px}
+  .steps{grid-template-columns:repeat(4,1fr)}
+  .case{grid-template-columns:300px 1fr;padding:46px 56px}
+  .band{padding:64px}
+}
+
+/* --- visuel héros avec photo --- */
+.hv{position:relative;height:540px;margin:0 -4px}
+.hv-photo{position:absolute;inset:0 0 40px 40px;border-radius:40px;overflow:hidden;background:linear-gradient(160deg,#FFE7D3,#FFC59A)}
+.hv-photo img{width:100%;height:100%;object-fit:cover;object-position:center 20%;mix-blend-mode:multiply;transform-origin:50% 80%;animation:bob 6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) scale(1.02)}50%{transform:translateY(-14px) scale(1.04)}}
+.hv-phone{position:absolute;left:0;bottom:0;width:170px;z-index:3;animation:flo2 7s ease-in-out infinite}
+@keyframes flo2{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-10px) rotate(-2deg)}}
+.chip{position:absolute;z-index:4;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:18px;padding:10px 14px 10px 10px;display:flex;gap:10px;align-items:center;font-size:.82rem;font-weight:600;box-shadow:0 18px 40px -18px rgba(20,33,61,.45);opacity:0;transform:translateY(14px) scale(.96);animation:pop 9s ease-in-out infinite}
+.chip b{display:block;font-size:.92rem}
+.chip .dot{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff;flex:0 0 auto;font-size:.95rem}
+.chip.c1{right:6px;top:34px;animation-delay:.3s}.chip.c2{right:24px;top:200px;animation-delay:3.3s}.chip.c3{left:140px;bottom:60px;animation-delay:6.3s}
+@keyframes pop{0%{opacity:0;transform:translateY(14px) scale(.96)}6%,30%{opacity:1;transform:none}38%,100%{opacity:0;transform:translateY(-8px) scale(.98)}}
+/* --- ruban de notifications --- */
+.ticker{margin-top:34px;overflow:hidden;border-block:1px solid var(--line);background:#fff;padding:14px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.tk-track{display:flex;gap:34px;width:max-content;animation:tk 38s linear infinite;font-weight:600;color:var(--ink-2);font-size:.95rem;white-space:nowrap}
+@keyframes tk{to{transform:translateX(-50%)}}
+/* --- photo pourquoi --- */
+.shot-card.photo{padding:0;background:#2b2d33;min-height:520px}
+.sc-photo{position:absolute;inset:0}
+.sc-photo img{width:100%;height:100%;object-fit:cover;object-position:center 30%;transform:scale(1.08);transition:transform 1.4s cubic-bezier(.2,.8,.2,1)}
+.shot-card.in .sc-photo img{transform:scale(1)}
+.shot-card .bd1{top:28px}.shot-card .bd2{top:auto;bottom:28px}
+/* --- chiffres animés --- */
+.stats{background:#0F1830;color:#fff;position:relative;overflow:hidden}
+.stats::before{content:"";position:absolute;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(255,122,26,.35),transparent 65%);right:-160px;top:-160px}
+.stats h2 em{color:#FF9A4D}
+.st-head{display:grid;gap:26px;align-items:center;position:relative}
+.st-photo{border-radius:30px;overflow:hidden;height:260px}
+.st-photo img{width:100%;height:100%;object-fit:cover;object-position:center 40%}
+.dash{display:grid;gap:14px;margin-top:34px;position:relative}
+.tile{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:26px;padding:22px;backdrop-filter:blur(6px)}
+.t-lab{color:#AEB6CC;font-size:.88rem;font-weight:600}
+.t-num{font-family:"Instrument Serif",Georgia,serif;font-size:3.1rem;line-height:1.05;margin-top:4px}
+.t-up{color:#5BE3A6;font-weight:700;font-size:.9rem}
+.bars{width:100%;height:150px;margin-top:16px;overflow:visible}
+.bars rect{fill:rgba(255,255,255,.22);transform-box:fill-box;transform-origin:50% 100%;transform:scaleY(0);transition:transform 1s cubic-bezier(.2,.8,.2,1) var(--d)}
+.bars rect.hot{fill:#FF7A1A}
+.tile.in .bars rect{transform:scaleY(1)}
+.days{display:flex;justify-content:space-between;color:#AEB6CC;font-size:.78rem;margin-top:8px;padding:0 4px}
+.donut-w{position:relative;width:170px;height:170px;margin:14px auto 10px}
+.donut{width:100%;height:100%;transform:rotate(-90deg)}
+.donut circle{fill:none;stroke-width:16}
+.donut .trk{stroke:rgba(255,255,255,.08)}
+.donut .seg{stroke-linecap:round;stroke-dasharray:0 289;stroke-dashoffset:var(--off);transition:stroke-dasharray 1.4s cubic-bezier(.2,.8,.2,1)}
+.tile.in .donut .seg{stroke-dasharray:var(--len) 289}
+.donut .s1{stroke:#1DC8FF}.donut .s2{stroke:#FF7A1A;transition-delay:.25s}.donut .s3{stroke:#FFFFFF;transition-delay:.5s}
+.donut-c{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.donut-c b{font-family:"Instrument Serif",Georgia,serif;font-weight:400;font-size:2.6rem;line-height:1}
+.donut-c span{color:#AEB6CC;font-size:.8rem}
+.legend{display:grid;gap:6px;font-size:.88rem}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:8px}
+.spark{width:100%;height:90px;margin-top:12px}
+.spark .line{stroke:#FF9A4D;stroke-width:3;stroke-linejoin:round;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;transition:stroke-dashoffset 1.8s ease}
+.spark .area{opacity:0;transition:opacity 1s ease .8s}
+.tile.in .spark .line{stroke-dashoffset:0}.tile.in .spark .area{opacity:1}
+.t-mini{display:flex;gap:18px;color:#AEB6CC;font-size:.88rem;margin-top:8px}.t-mini b{color:#fff}
+.drv{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:center;margin-top:16px;font-size:.92rem}
+.drv b{font-weight:700}
+.meter{height:10px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.meter i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,#FF7A1A,#FFB26B);transition:width 1.3s cubic-bezier(.2,.8,.2,1) .2s}
+.tile.in .meter i{width:var(--w)}
+.t-ok{margin-top:18px;color:#5BE3A6;font-weight:700;font-size:.9rem}
+.st-note{color:#7F89A3;font-size:.82rem;margin-top:16px;position:relative}
+/* --- bande avec photo --- */
+.band{display:grid;gap:26px;align-items:center;text-align:left;padding:22px}
+.band-photo{border-radius:26px;overflow:hidden;position:relative;z-index:1;aspect-ratio:4/5;max-height:420px}
+.band-photo img{width:100%;height:100%;object-fit:cover;transform:scale(1.1);transition:transform 1.4s cubic-bezier(.2,.8,.2,1)}
+.band.in .band-photo img{transform:scale(1)}
+.band-txt{position:relative;z-index:1;padding:4px 10px 18px}
+/* --- fin avec photo --- */
+.cl-photo{position:relative;width:min(300px,78%);margin:0 auto 26px;border-radius:999px 999px 34px 34px;overflow:visible}
+.cl-photo img{border-radius:999px 999px 34px 34px;aspect-ratio:3/4;object-fit:cover;width:100%;box-shadow:0 40px 60px -30px rgba(20,33,61,.5)}
+.cl-chip{position:absolute;right:-18px;bottom:40px;background:#fff;border-radius:999px;padding:10px 16px;font-weight:700;box-shadow:0 16px 30px -14px rgba(20,33,61,.4);animation:flo3 4s ease-in-out infinite}
+@keyframes flo3{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(2deg)}}
+@media (min-width:760px){ .dash{grid-template-columns:1.4fr 1fr} .dash .big{grid-row:span 2} }
+@media (min-width:980px){
+  .hv{height:620px}
+  .hv-phone{width:200px}
+  .st-head{grid-template-columns:1.2fr 1fr}
+  .st-photo{height:330px}
+  .dash{grid-template-columns:1.3fr 1fr 1fr}
+  .dash .big{grid-row:span 2}
+  .band{grid-template-columns:.9fr 1.1fr;padding:30px}
+  .band-photo{max-height:none}
+  .band-txt{padding:20px 40px}
+}
+</style>
+</head>
+<body>
+<div class="announce">Comptoir est en ligne 🎉 Ta boutique prête en 2 minutes.<a href="./">Essayer</a></div>
+<header id="hd"><div class="wrap hd">
+  <a class="logo" href="#top" aria-label="Comptoir, accueil"><svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#14213D"/><g transform="translate(24 24) scale(.74) translate(-24 -23)"><path d="M33.81 30.39A11.5 11.5 0 1 1 33.81 15.61" fill="none" stroke="#fff" stroke-width="7.2" stroke-linecap="round"/><path d="M15.2 29.5L11.6 41.2L21.8 34.6Z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><circle cx="24.6" cy="23" r="4.7" fill="#FF7A1A"/></g></svg>comptoir</a>
+  <nav class="nav" aria-label="Navigation principale"><a class="l" href="#pourquoi">Pourquoi</a><a class="l" href="#comment">Comment ça marche</a><a class="l" href="#tarifs">Tarifs</a><a class="l" href="#faq">Questions</a><a class="login" href="./">Se connecter</a><a class="btn saf" href="./">Commencer</a></nav>
+</div></header>
+
+<main id="top">
+<section class="hero">
+  <div class="blob b1" aria-hidden="true"></div><div class="blob b2" aria-hidden="true"></div>
+  <div class="wrap hero-grid">
+    <div style="position:relative;z-index:4">
+      <span class="kick rv">● Pour les vendeurs en ligne au Sénégal</span>
+      <h1 class="serif rv d1">Vos commandes en ligne, <em>sous contrôle.</em></h1>
+      <p class="lead rv d2">Fini les commandes perdues dans WhatsApp. Colle un message, Comptoir crée la commande, suit la livraison et te dit qui a payé.</p>
+      <div class="ctas rv d3"><a class="btn saf" href="./">Créer ma boutique gratuitement <span class="arr">↗</span></a><a class="btn ghost" href="./?b=kado">Voir une vraie boutique</a></div>
+      <div class="trust rv d3"><span><i></i>Wave, Orange Money et cash</span><span><i></i>Rien à installer</span><span><i></i>Pensé pour Dakar</span></div>
+    </div>
+    <div class="hv" aria-hidden="true">
+      <div class="hv-photo"><img src="lp/saut.jpg" alt=""></div>
+      <div class="phone hv-phone"><img src="lp/orders.jpg" alt=""></div>
+      <div class="chip c1"><span class="dot" style="background:#FF7A1A">🛍</span><span><b>Nouvelle commande</b>Aïssatou · 25 000 F</span></div>
+      <div class="chip c2"><span class="dot" style="background:#1FA971">✓</span><span><b>Paiement reçu</b>Orange Money · 17 500 F</span></div>
+      <div class="chip c3"><span class="dot" style="background:#14213D">🛵</span><span><b>En route</b>Livreur : Ablaye</span></div>
+    </div>
+  </div>
+  <div class="hero-dock"></div>
+  <div class="wrap"><div class="facts">
+    <div class="fact rv"><b>2 min</b><span>pour ouvrir ta boutique en ligne</span></div>
+    <div class="fact rv d1"><b>1 lien</b><span>à partager sur WhatsApp, Insta et TikTok</span></div>
+    <div class="fact rv d2"><b>3 modes</b><span>de paiement suivis : Wave, OM, cash</span></div>
+    <div class="fact rv d3"><b>0 F</b><span>pour commencer</span></div>
+  </div></div>
+  <div class="ticker" aria-hidden="true"><div class="tk-track">
+    <span>🛍 Commande #1042 · Parcelles · 17 500 F</span><span>✓ Wave reçu · 12 500 F</span><span>🛵 Livrée · Ouakam</span><span>🛍 Commande #1043 · Mermoz · 28 000 F</span><span>✓ Orange Money reçu · 25 000 F</span><span>🔔 Stock bas · Lampe ciel étoilé</span><span>🛵 En route · Grand Yoff</span>
+    <span>🛍 Commande #1042 · Parcelles · 17 500 F</span><span>✓ Wave reçu · 12 500 F</span><span>🛵 Livrée · Ouakam</span><span>🛍 Commande #1043 · Mermoz · 28 000 F</span><span>✓ Orange Money reçu · 25 000 F</span><span>🔔 Stock bas · Lampe ciel étoilé</span><span>🛵 En route · Grand Yoff</span>
+  </div></div>
+</section>
+
+<section class="pad" id="pourquoi"><div class="wrap why">
+  <div>
+    <span class="kick rv">Pourquoi Comptoir</span>
+    <h2 class="serif rv d1">Pas un cahier. Pas un tableur. <em>Ton comptoir.</em></h2>
+    <p class="sub rv d2">On a construit l’outil qu’il manquait aux vendeurs qui vendent sur WhatsApp, Instagram et TikTok : simple, rapide, sur le téléphone.</p>
+    <div class="feats">
+      <div class="feat rv"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3.5-7.1L21 3v6h-6"/></svg></div><div><h3>Zéro commande perdue</h3><p>Colle le message du client : nom, numéro, produits et adresse sont remplis tout seuls.</p></div></div>
+      <div class="feat rv"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1.5-5h15L21 9"/><path d="M4 9v11h16V9"/><path d="M9 20v-6h6v6"/></svg></div><div><h3>Ta boutique en ligne, avec un seul lien</h3><p>Tes clients voient tes produits, ajoutent au panier et commandent. Toi, tu reçois une alerte.</p></div></div>
+      <div class="feat rv"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="13" rx="3"/><path d="M2 11h20"/></svg></div><div><h3>Tu sais qui a payé</h3><p>Wave, Orange Money ou cash à la livraison : chaque paiement est suivi, et l’encaissé du jour s’affiche.</p></div></div>
+      <div class="feat rv"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="3"/><circle cx="18" cy="17" r="3"/><path d="M9 17h6l-2-7h-3M15 10h3l2 4"/></svg></div><div><h3>L’argent chez tes livreurs, au franc près</h3><p>Comptoir garde le compte du cash encaissé par chaque livreur, jusqu’à ce qu’il te le reverse.</p></div></div>
+    </div>
+  </div>
+  <div class="shot-card photo rv">
+    <div class="badge bd1"><span class="dot" style="background:#FF7A1A">!</span><span><b>Nouvelle commande</b>Aïssatou · 25 000 F</span></div>
+    <div class="badge bd2"><span class="dot" style="background:#1FA971">✓</span><span><b>Paiement reçu</b>Orange Money</span></div>
+    <div class="sc-photo"><img src="lp/kick.jpg" alt="Un vendeur ravi en voyant une nouvelle commande sur son téléphone" loading="lazy"></div>
+  </div>
+</div></section>
+
+<section class="pad stats" id="chiffres"><div class="wrap">
+  <div class="st-head">
+    <div><span class="kick rv" style="color:#FFB26B">Tes chiffres, en direct</span>
+    <h2 class="serif rv d1">Regarde ton business <em>grandir.</em></h2>
+    <p class="sub rv d2" style="color:#C9CFE0">Chaque commande, chaque paiement, chaque livraison s’additionne tout seul. Tu sais enfin combien tu gagnes.</p></div>
+    <div class="st-photo rv d2"><img src="lp/caddie.jpg" alt="" loading="lazy"></div>
+  </div>
+  <div class="dash">
+    <div class="tile big rv">
+      <div class="t-lab">Encaissé cette semaine</div>
+      <div class="t-num"><span class="count" data-to="487500">0</span> F</div>
+      <div class="t-up">▲ <span class="count" data-to="32">0</span> % par rapport à la semaine passée</div>
+      <svg class="bars" viewBox="0 0 350 150" preserveAspectRatio="none" aria-hidden="true">
+        <g class="bar-g">
+          <rect x="6" width="36" rx="8" y="90" height="60" style="--d:0s"/><rect x="56" width="36" rx="8" y="70" height="80" style="--d:.08s"/><rect x="106" width="36" rx="8" y="96" height="54" style="--d:.16s"/><rect x="156" width="36" rx="8" y="50" height="100" style="--d:.24s"/><rect x="206" width="36" rx="8" y="62" height="88" style="--d:.32s"/><rect x="256" width="36" rx="8" y="28" height="122" style="--d:.4s"/><rect class="hot" x="306" width="36" rx="8" y="8" height="142" style="--d:.48s"/>
+        </g></svg>
+      <div class="days"><span>Lun</span><span>Mar</span><span>Mer</span><span>Jeu</span><span>Ven</span><span>Sam</span><span>Dim</span></div>
+    </div>
+    <div class="tile rv d1">
+      <div class="t-lab">Comment tes clients paient</div>
+      <div class="donut-w"><svg class="donut" viewBox="0 0 120 120" aria-hidden="true">
+        <circle cx="60" cy="60" r="46" class="trk"/>
+        <circle cx="60" cy="60" r="46" class="seg s1" style="--len:130;--off:0"/>
+        <circle cx="60" cy="60" r="46" class="seg s2" style="--len:87;--off:-133"/>
+        <circle cx="60" cy="60" r="46" class="seg s3" style="--len:63;--off:-223"/>
+      </svg><div class="donut-c"><b><span class="count" data-to="64">0</span></b><span>commandes</span></div></div>
+      <div class="legend"><span><i style="background:#1DC8FF"></i>Wave 45 %</span><span><i style="background:#FF7A1A"></i>Orange Money 30 %</span><span><i style="background:#FFFFFF"></i>Cash 25 %</span></div>
+    </div>
+    <div class="tile rv d2">
+      <div class="t-lab">Commandes ce mois</div>
+      <div class="t-num"><span class="count" data-to="186">0</span></div>
+      <svg class="spark" viewBox="0 0 300 90" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="sg" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#FF7A1A" stop-opacity=".45"/><stop offset="1" stop-color="#FF7A1A" stop-opacity="0"/></linearGradient></defs>
+        <path class="area" d="M0 80 L30 72 L60 76 L90 60 L120 64 L150 46 L180 50 L210 34 L240 38 L270 18 L300 8 L300 90 L0 90 Z" fill="url(#sg)"/>
+        <path class="line" d="M0 80 L30 72 L60 76 L90 60 L120 64 L150 46 L180 50 L210 34 L240 38 L270 18 L300 8" fill="none"/></svg>
+      <div class="t-mini"><span>Livrées <b><span class="count" data-to="171">0</span></b></span><span>Retours <b><span class="count" data-to="3">0</span></b></span></div>
+    </div>
+    <div class="tile rv d3">
+      <div class="t-lab">Cash chez les livreurs</div>
+      <div class="drv"><span>Ablaye</span><div class="meter"><i style="--w:72%"></i></div><b>36 000 F</b></div>
+      <div class="drv"><span>Modou</span><div class="meter"><i style="--w:44%"></i></div><b>22 000 F</b></div>
+      <div class="drv"><span>Pape</span><div class="meter"><i style="--w:18%"></i></div><b>9 000 F</b></div>
+      <div class="t-ok">✓ Tout est noté, rien ne se perd.</div>
+    </div>
+  </div>
+  <p class="st-note rv">Exemple de tableau de bord avec des chiffres fictifs, pour te montrer ce que Comptoir calcule pour toi.</p>
+</div></section>
+
+<section class="pad how" id="comment"><div class="wrap">
+  <span class="kick rv">Comment ça marche</span>
+  <h2 class="serif rv d1">Du message WhatsApp <em>à l’argent encaissé.</em></h2>
+  <p class="sub rv d2">Quatre étapes, toutes sur ton téléphone.</p>
+  <div class="steps">
+    <div class="step rv"><div class="n">01</div><h3>Crée ta boutique</h3><p>Email, mot de passe, nom de la boutique. Ajoute tes produits avec photos et prix.</p></div>
+    <div class="step rv d1"><div class="n">02</div><h3>Partage ton lien</h3><p>En statut WhatsApp, en bio Insta ou TikTok. Tes clients commandent sans rien installer.</p></div>
+    <div class="step rv d2"><div class="n">03</div><h3>Confirme et livre</h3><p>Un message WhatsApp tout prêt pour le client et pour le livreur. Le stock baisse tout seul.</p></div>
+    <div class="step rv d3"><div class="n">04</div><h3>Encaisse sereinement</h3><p>Tu vois ce qui est payé, ce qui reste à encaisser et l’argent chez chaque livreur.</p></div>
+  </div>
+</div></section>
+
+<section class="pad"><div class="wrap">
+  <div class="band rv"><div class="band-photo"><img src="lp/trio.jpg" alt="Trois amis surexcités devant une notification sur un téléphone" loading="lazy"></div>
+    <div class="band-txt"><h3>Ta prochaine commande arrive.<br>Tu es prêt ?</h3><p>Création gratuite. 2 minutes. Sans engagement.</p><a class="btn saf" href="./">Je me lance <span class="arr">↗</span></a></div></div>
+</div></section>
+
+<section class="pad" id="tarifs" style="padding-top:20px"><div class="wrap">
+  <span class="kick rv">Tarifs</span>
+  <h2 class="serif rv d1">Gratuit pour démarrer. <em>Pro pour grandir.</em></h2>
+  <p class="sub rv d2">Commence gratuitement. Passe Pro quand tes commandes décollent.</p>
+  <div class="plans">
+    <div class="plan rv">
+      <h3>Découverte</h3><p class="d">Pour lancer ta boutique</p>
+      <div class="price"><b>0</b><span>FCFA par mois</span></div>
+      <ul><li>Ta boutique en ligne avec son lien</li><li>Jusqu’à 30 commandes par mois</li><li>Commande depuis un message WhatsApp</li><li>Suivi Wave, Orange Money et cash</li><li>Messages WhatsApp tout prêts</li></ul>
+      <a class="btn ghost" href="./">Commencer <span class="arr">↗</span></a>
+    </div>
+    <div class="plan pro rv d1">
+      <span class="tag">Offre de lancement</span>
+      <h3>Pro</h3><p class="d">Pour les boutiques qui tournent</p>
+      <div class="price"><b>5 000</b><span>FCFA par mois</span><s>7 500 F</s></div>
+      <ul><li>Commandes illimitées</li><li>Livreurs et argent chez les livreurs</li><li>Alertes de nouvelles commandes</li><li>Produits sur commande et prix barrés</li><li>Export de tes ventes</li><li>Aide prioritaire sur WhatsApp</li></ul>
+      <a class="btn saf" href="./">Passer Pro <span class="arr">↗</span></a>
+    </div>
+  </div>
+  <p class="note rv">Tarif de lancement pour les premières boutiques.</p>
+</div></section>
+
+<section class="pad" style="padding-top:10px"><div class="wrap">
+  <span class="kick rv">Déjà en ligne</span>
+  <h2 class="serif rv d1">Une vraie boutique, <em>en vrai.</em></h2>
+  <div class="case rv d2">
+    <div class="phone"><img src="lp/store.jpg" alt="La boutique Kado ouverte sur un téléphone"></div>
+    <div><blockquote>« Kado vend ses cadeaux tech à Dakar avec Comptoir : un lien, des commandes, zéro oubli. »</blockquote>
+    <p class="who">Kado · cadeaux tech livrés partout à Dakar</p>
+    <a class="btn ink" href="./?b=kado" style="margin-top:10px">Visiter la boutique Kado <span class="arr">↗</span></a></div>
+  </div>
+</div></section>
+
+<section class="pad" id="faq" style="padding-top:20px"><div class="wrap" style="max-width:860px">
+  <span class="kick rv">Questions</span>
+  <h2 class="serif rv d1">Tu te demandes <em>peut-être…</em></h2>
+  <div class="faq rv d2">
+    <details><summary>Mes clients doivent-ils installer une application ?</summary><p>Non. Ils ouvrent ton lien dans leur navigateur, choisissent leurs produits et commandent. C’est tout.</p></details>
+    <details><summary>Comptoir touche-t-il à mon argent ?</summary><p>Jamais. Tes clients paient directement sur ton numéro Wave ou Orange Money, ou en cash au livreur. Comptoir sert seulement à suivre qui a payé.</p></details>
+    <details><summary>Il me faut un ordinateur ?</summary><p>Non. Tout se fait sur ton téléphone. Tu peux aussi l’ajouter à ton écran d’accueil comme une application.</p></details>
+    <details><summary>Et si je perds mon téléphone ?</summary><p>Tes commandes sont gardées en ligne. Reconnecte-toi avec ton email et ton mot de passe sur un autre téléphone, tu retrouves tout.</p></details>
+    <details><summary>Je peux vendre des produits « sur commande » ?</summary><p>Oui. Indique le délai de livraison, et ton client peut commander même sans stock.</p></details>
+  </div>
+</div></section>
+
+<section class="pad closing"><div class="wrap">
+  <div class="cl-photo rv"><img src="lp/casquette.jpg" alt="Une cliente stylée avec casquette et lunettes de soleil" loading="lazy"><span class="cl-chip">« Commande reçue ! »</span></div>
+  <span class="kick rv">Comptoir</span>
+  <h2 class="serif rv d1">Chaque commande <em>compte.</em></h2>
+  <p class="sub rv d2" style="margin:0 auto">Ouvre ta boutique aujourd’hui, partage ton lien ce soir.</p>
+  <div class="ctas rv d3"><a class="btn saf" href="./">Créer ma boutique gratuitement <span class="arr">↗</span></a><a class="btn ghost" href="./?b=kado">Voir un exemple</a></div>
+</div></section>
+</main>
+
+<footer><div class="wrap">
+  <div class="fgrid">
+    <div><a class="logo" href="#top"><svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#FFFFFF"/><g transform="translate(24 24) scale(.74) translate(-24 -23)"><path d="M33.81 30.39A11.5 11.5 0 1 1 33.81 15.61" fill="none" stroke="#14213D" stroke-width="7.2" stroke-linecap="round"/><path d="M15.2 29.5L11.6 41.2L21.8 34.6Z" fill="#14213D" stroke="#14213D" stroke-width="2" stroke-linejoin="round"/><circle cx="24.6" cy="23" r="4.7" fill="#FF7A1A"/></g></svg>comptoir</a>
+      <p style="max-width:30ch">Vos commandes en ligne, sous contrôle. L’outil des vendeurs en ligne au Sénégal.</p></div>
+    <div><h4>Produit</h4><ul><li><a href="#pourquoi">Pourquoi Comptoir</a></li><li><a href="#comment">Comment ça marche</a></li><li><a href="#tarifs">Tarifs</a></li><li><a href="#faq">Questions</a></li></ul></div>
+    <div><h4>Essayer</h4><ul><li><a href="./">Créer ma boutique</a></li><li><a href="./">Se connecter</a></li><li><a href="./?b=kado">Boutique exemple</a></li></ul></div>
+    <div><h4>Contact</h4><ul><li><a href="https://wa.me/221786592214" target="_blank" rel="noopener">WhatsApp</a></li><li>Dakar, Sénégal</li></ul></div>
+  </div>
+  <div class="copy"><span>© 2026 Comptoir. Tous droits réservés.</span><span>Fait à Dakar 🇸🇳</span></div>
+</div></footer>
+
+<script>
+(function(){
+  var hd=document.getElementById('hd');
+  addEventListener('scroll',function(){hd.classList.toggle('scrolled',scrollY>8)},{passive:true});
+  var els=document.querySelectorAll('.rv');
+  if(!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in')});return;}
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{rootMargin:'0px 0px -8% 0px'});
+  els.forEach(function(e){io.observe(e)});
+  var fmt=function(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,'\u202f')};
+  var cs=document.querySelectorAll('.count');
+  var red=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var io2=new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;io2.unobserve(e.target);var el=e.target,to=+el.dataset.to;if(red){el.textContent=fmt(to);return;}var t0=null;function step(t){if(!t0)t0=t;var k=Math.min(1,(t-t0)/1600),v=1-Math.pow(1-k,3);el.textContent=fmt(Math.round(to*v));if(k<1)requestAnimationFrame(step)}requestAnimationFrame(step)})},{threshold:.4});
+  cs.forEach(function(c){io2.observe(c)});
+})();
+</script>
+</body>
+</html>
