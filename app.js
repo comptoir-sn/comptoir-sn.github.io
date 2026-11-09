@@ -1374,11 +1374,11 @@ async function afterLogin(user){
   try{
     const ok = await loadAll();
     if(!ok) return authScreen('shop');
-    await loadSub();
-    if(!SUB.active) return paywall();
+    try{ await loadSub(); }catch(e){ if(isNetErr(e)) throw e; console.warn('Abonnement indisponible', e); SUB = null; }
+    if(SUB && !SUB.active) return paywall();
     startApp();
     setInterval(subWatch, 10 * 60 * 1000);
-    if(SUB.is_admin){ setTimeout(adminCheck, 1500); setInterval(adminCheck, 2 * 60 * 1000); }
+    if(SUB && SUB.is_admin){ setTimeout(adminCheck, 1500); setInterval(adminCheck, 2 * 60 * 1000); }
     setTimeout(subWatch, 1200);
   }catch(e){ console.warn(e); authScreen(isNetErr(e) ? 'offline' : 'login', isNetErr(e) ? '' : errText(e)); }
 }

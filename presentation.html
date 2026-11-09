@@ -254,10 +254,15 @@ footer a:hover{color:#fff}
   .band-photo{max-height:none}
   .band-txt{padding:20px 40px}
 }
+.plans.one{max-width:760px;margin-left:auto;margin-right:auto}
+.plans.one .plan{padding:34px}
+.pro-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:14px}
+.plans.one ul{grid-template-columns:1fr;column-gap:26px}
+@media (min-width:760px){.plans.one{grid-template-columns:1fr}.plans.one ul{grid-template-columns:1fr 1fr}.plans.one .btn{align-self:flex-start}}
 </style>
 </head>
 <body>
-<div class="announce">Comptoir est en ligne 🎉 Ta boutique prête en 2 minutes.<a href="./">Essayer</a></div>
+<div class="announce">Comptoir est en ligne 🎉 Ta boutique prête en 2 minutes.<a href="./">Commencer</a></div>
 <header id="hd"><div class="wrap hd">
   <a class="logo" href="#top" aria-label="Comptoir, accueil"><svg width="34" height="34" viewBox="0 0 48 48" aria-hidden="true"><rect width="48" height="48" rx="12" fill="#14213D"/><g transform="translate(24 24) scale(.74) translate(-24 -23)"><path d="M33.81 30.39A11.5 11.5 0 1 1 33.81 15.61" fill="none" stroke="#fff" stroke-width="7.2" stroke-linecap="round"/><path d="M15.2 29.5L11.6 41.2L21.8 34.6Z" fill="#fff" stroke="#fff" stroke-width="2" stroke-linejoin="round"/><circle cx="24.6" cy="23" r="4.7" fill="#FF7A1A"/></g></svg>comptoir</a>
   <nav class="nav" aria-label="Navigation principale"><a class="l" href="#pourquoi">Pourquoi</a><a class="l" href="#comment">Comment ça marche</a><a class="l" href="#tarifs">Tarifs</a><a class="l" href="#faq">Questions</a><a class="login" href="./">Se connecter</a><a class="btn saf" href="./">Commencer</a></nav>
@@ -271,7 +276,7 @@ footer a:hover{color:#fff}
       <span class="kick rv">● Pour les vendeurs en ligne au Sénégal</span>
       <h1 class="serif rv d1">Vos commandes en ligne, <em>sous contrôle.</em></h1>
       <p class="lead rv d2">Fini les commandes perdues dans WhatsApp. Colle un message, Comptoir crée la commande, suit la livraison et te dit qui a payé.</p>
-      <div class="ctas rv d3"><a class="btn saf" href="./">Créer ma boutique gratuitement <span class="arr">↗</span></a><a class="btn ghost" href="./?b=kado">Voir une vraie boutique</a></div>
+      <div class="ctas rv d3"><a class="btn saf" href="./">Créer ma boutique <span class="arr">↗</span></a><a class="btn ghost" href="./?b=kado">Voir une vraie boutique</a></div>
       <div class="trust rv d3"><span><i></i>Wave, Orange Money et cash</span><span><i></i>Rien à installer</span><span><i></i>Pensé pour Dakar</span></div>
     </div>
     <div class="hv" aria-hidden="true">
@@ -287,7 +292,7 @@ footer a:hover{color:#fff}
     <div class="fact rv"><b>2 min</b><span>pour ouvrir ta boutique en ligne</span></div>
     <div class="fact rv d1"><b>1 lien</b><span>à partager sur WhatsApp, Insta et TikTok</span></div>
     <div class="fact rv d2"><b>3 modes</b><span>de paiement suivis : Wave, OM, cash</span></div>
-    <div class="fact rv d3"><b>0 F</b><span>pour commencer</span></div>
+    <div class="fact rv d3"><b>9 900 F</b><span>par mois, tout compris</span></div>
   </div></div>
   <div class="ticker" aria-hidden="true"><div class="tk-track">
     <span>🛍 Commande #1042 · Parcelles · 17 500 F</span><span>✓ Wave reçu · 12 500 F</span><span>🛵 Livrée · Ouakam</span><span>🛍 Commande #1043 · Mermoz · 28 000 F</span><span>✓ Orange Money reçu · 25 000 F</span><span>🔔 Stock bas · Lampe ciel étoilé</span><span>🛵 En route · Grand Yoff</span>
@@ -375,29 +380,23 @@ footer a:hover{color:#fff}
 
 <section class="pad"><div class="wrap">
   <div class="band rv"><div class="band-photo"><img src="trio.jpg" alt="Trois amis surexcités devant une notification sur un téléphone" loading="lazy"></div>
-    <div class="band-txt"><h3>Ta prochaine commande arrive.<br>Tu es prêt ?</h3><p>Création gratuite. 2 minutes. Sans engagement.</p><a class="btn saf" href="./">Je me lance <span class="arr">↗</span></a></div></div>
+    <div class="band-txt"><h3>Ta prochaine commande arrive.<br>Tu es prêt ?</h3><p>9 900 F par mois. Prête en 2 minutes. Sans engagement.</p><a class="btn saf" href="./">Je me lance <span class="arr">↗</span></a></div></div>
 </div></section>
 
 <section class="pad" id="tarifs" style="padding-top:20px"><div class="wrap">
   <span class="kick rv">Tarifs</span>
-  <h2 class="serif rv d1">Gratuit pour démarrer. <em>Pro pour grandir.</em></h2>
-  <p class="sub rv d2">Commence gratuitement. Passe Pro quand tes commandes décollent.</p>
-  <div class="plans">
-    <div class="plan rv">
-      <h3>Découverte</h3><p class="d">Pour lancer ta boutique</p>
-      <div class="price"><b>0</b><span>FCFA par mois</span></div>
-      <ul><li>Ta boutique en ligne avec son lien</li><li>Jusqu’à 30 commandes par mois</li><li>Commande depuis un message WhatsApp</li><li>Suivi Wave, Orange Money et cash</li><li>Messages WhatsApp tout prêts</li></ul>
-      <a class="btn ghost" href="./">Commencer <span class="arr">↗</span></a>
-    </div>
+  <h2 class="serif rv d1">Un seul prix. <em>Tout compris.</em></h2>
+  <p class="sub rv d2">Pas de version limitée, pas de surprise : tout Comptoir pour le prix d’un petit plat par semaine.</p>
+  <div class="plans one">
     <div class="plan pro rv d1">
-      <span class="tag">Recommandé</span>
-      <h3>Pro</h3><p class="d">Pour les boutiques qui tournent</p>
-      <div class="price"><b>9 900</b><span>FCFA par mois</span></div>
-      <ul><li>Commandes illimitées</li><li>Livreurs et argent chez les livreurs</li><li>Alertes de nouvelles commandes</li><li>Produits sur commande et prix barrés</li><li>Export de tes ventes</li><li>Aide prioritaire sur WhatsApp</li></ul>
-      <a class="btn saf" href="./">Passer Pro <span class="arr">↗</span></a>
+      <span class="tag">Tout compris</span>
+      <div class="pro-top"><div><h3>Comptoir</h3><p class="d">Tout l’outil, sans limite, pour ta boutique</p></div>
+      <div class="price"><b>9 900</b><span>FCFA par mois</span></div></div>
+      <ul><li>Ta boutique en ligne avec son lien</li><li>Commandes illimitées</li><li>Commande depuis un message WhatsApp</li><li>Suivi Wave, Orange Money et cash</li><li>Messages WhatsApp tout prêts</li><li>Livreurs et argent chez les livreurs</li><li>Alertes de nouvelles commandes</li><li>Produits sur commande et prix barrés</li><li>Export de tes ventes</li><li>Aide sur WhatsApp</li></ul>
+      <a class="btn saf" href="./">Je prends Comptoir <span class="arr">↗</span></a>
     </div>
   </div>
-  <p class="note rv">Sans engagement : tu arrêtes quand tu veux.</p>
+  <p class="note rv" style="text-align:center">Sans engagement : tu arrêtes quand tu veux.</p>
 </div></section>
 
 <section class="pad" style="padding-top:10px"><div class="wrap">
@@ -428,7 +427,7 @@ footer a:hover{color:#fff}
   <span class="kick rv">Comptoir</span>
   <h2 class="serif rv d1">Chaque commande <em>compte.</em></h2>
   <p class="sub rv d2" style="margin:0 auto">Ouvre ta boutique aujourd’hui, partage ton lien ce soir.</p>
-  <div class="ctas rv d3"><a class="btn saf" href="./">Créer ma boutique gratuitement <span class="arr">↗</span></a><a class="btn ghost" href="./?b=kado">Voir un exemple</a></div>
+  <div class="ctas rv d3"><a class="btn saf" href="./">Créer ma boutique <span class="arr">↗</span></a><a class="btn ghost" href="./?b=kado">Voir un exemple</a></div>
 </div></section>
 </main>
 
