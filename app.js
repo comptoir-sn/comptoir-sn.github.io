@@ -1034,26 +1034,102 @@ function openStoreProduct(id){
     ${p.desc?`<p style="margin:12px 0 0">${esc(p.desc)}</p>`:''}
     <div class="actions">${(out||!open)?`<button class="btn ghost" disabled>${out?'Épuisé':'Fermé'}</button>`:`<button class="btn mango" data-sinc="${p.id}" data-close-after>${q?`Ajouter encore (${q} dans le panier)`:'Ajouter au panier'}</button>`}</div>`);
 }
+/* ===================== Kado : couverture animée produit par produit ===================== */
+const KH = {i:0, timer:null, colors:{}, dur:3600, pause:false};
+const KH_FALLBACK = [['#3B2A86','#120C2E'],['#3A8FD0','#123A63'],['#E2453F','#5E0E16'],['#18C29C','#08463A'],['#FF4F3A','#6B160C']];
+function khList(){ return S.products.filter(p=>!p.archived && p.img).slice(0,6); }
+function khColor(p, k){
+  return KH.colors[p.id] || KH_FALLBACK[k % KH_FALLBACK.length];
+}
+function rgbToHsl(r,g,b){ r/=255; g/=255; b/=255; const mx=Math.max(r,g,b), mn=Math.min(r,g,b); let h=0, s=0; const l=(mx+mn)/2;
+  if(mx!==mn){ const d=mx-mn; s = l>.5 ? d/(2-mx-mn) : d/(mx+mn); h = mx===r ? (g-b)/d+(g<b?6:0) : mx===g ? (b-r)/d+2 : (r-g)/d+4; h*=60; } return [h,s,l]; }
+function khAnalyse(p){
+  if(KH.colors[p.id] || !p.img) return;
+  const im = new Image(); im.crossOrigin = 'anonymous';
+  im.onload = () => { try{
+    const n = 36, cv = document.createElement('canvas'); cv.width = n; cv.height = n; const ctx = cv.getContext('2d');
+    ctx.drawImage(im, 0, 0, n, n); const d = ctx.getImageData(0, 0, n, n).data;
+    let x=0, y=0, w=0, lsum=0, cnt=0;
+    for(let k=0; k<d.length; k+=4){ const [h,s,l] = rgbToHsl(d[k],d[k+1],d[k+2]); if(d[k+3]<128 || l>.93) continue; cnt++; lsum+=l; const wt = s*s + .02; x += Math.cos(h*Math.PI/180)*wt; y += Math.sin(h*Math.PI/180)*wt; w += wt*s; }
+    if(!cnt) return;
+    const sat = Math.min(.75, w/Math.max(.0001, Math.hypot(x,y)) ), strength = Math.hypot(x,y)/cnt, hue = (Math.atan2(y,x)*180/Math.PI + 360) % 360, lum = lsum/cnt;
+    let c;
+    if(strength < .035) c = lum > .55 ? ['#A4A9B4','#4E5260'] : ['#3A3A42','#101013'];
+    else c = [`hsl(${hue.toFixed(0)} ${Math.round(Math.max(.45,sat)*100)}% 46%)`, `hsl(${hue.toFixed(0)} ${Math.round(Math.max(.45,sat)*100)}% 16%)`];
+    KH.colors[p.id] = c;
+    const list = khList(); if(list[KH.i] && list[KH.i].id === p.id) khPaint();
+  }catch(e){} };
+  im.src = p.img;
+}
+function storeHero(open){
+  const list = khList(), sh = S.shop;
+  if(KH.i >= list.length) KH.i = 0;
+  const wa = phoneOk(sh.whatsapp) ? `https://wa.me/221${phoneDigits(sh.whatsapp)}` : '';
+  if(!list.length) return `<section class="kh empty"><div class="kh-top"><img class="kh-logo" src="kado-logo-blanc.svg" alt="${esc(sh.name)}"></div><div class="kh-copy"><h1>Le cadeau qui fait <em>waouh.</em></h1></div></section>`;
+  return `<section class="kh" id="kh" aria-roledescription="carrousel" aria-label="Produits à la une">
+    <div class="kh-bg"></div><div class="kh-glow"></div>
+    <div class="kh-top"><img class="kh-logo" src="kado-logo-blanc.svg" alt="${esc(sh.name)}">${wa?`<a class="kh-wa" href="${wa}" target="_blank" rel="noopener">WhatsApp</a>`:''}</div>
+    <div class="kh-copy"><p class="kh-kick">Sélection de fin d’année</p><h1>Le cadeau qui fait <em>waouh.</em></h1></div>
+    <div class="kh-stage" id="khStage">${list.map((p,k)=>`<button type="button" class="kh-item" data-k="${k}" data-sview="${p.id}" aria-label="Voir ${esc(p.name)}" tabindex="-1"><span class="kh-card"><img src="${esc(p.img)}" alt="" ${k===0?'':'loading="lazy"'} decoding="async"></span></button>`).join('')}${list.length>1?`<button type="button" class="kh-next" id="khNext" aria-label="Produit suivant"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" class="kh-ring-bg"/><circle cx="32" cy="32" r="30" class="kh-ring" id="khRing"/></svg><img id="khNextImg" alt=""></button>`:''}</div>
+    <div class="kh-info" aria-live="polite">${list.map((p,k)=>{ const q = cart[p.id]||0, out = !p.preorder && p.stock<=0;
+      return `<div class="kh-slide" data-k="${k}">
+        <div class="kh-name">${esc(p.name)}</div>
+        <div class="kh-price"><b class="num">${F(p.price)}</b>${p.oldPrice?`<s class="num">${F(p.oldPrice)}</s>`:''}</div>
+        <div class="kh-sub">${p.freeShipping?'Livraison offerte':p.preorder?`Sur commande · livré en ${esc(p.delay||'15 à 20 jours')}`:'En stock · livré à Dakar'}</div>
+        <div class="kh-cta">${(out||!open)?`<span class="kh-btn off">${out?'Épuisé':'Fermé'}</span>`:`<button type="button" class="kh-btn" data-sinc="${p.id}">${q?`Dans le panier (${q}) · +1`:'Commander'}</button>`}<button type="button" class="kh-link" data-sview="${p.id}">Voir le détail</button></div>
+      </div>`; }).join('')}</div>
+    ${list.length>1?`
+    <div class="kh-dots">${list.map((p,k)=>`<button type="button" data-khgo="${k}" aria-label="Produit ${k+1}"></button>`).join('')}</div>`:''}
+  </section>`;
+}
+function khPaint(){
+  const el = $('#kh'); if(!el) return;
+  const list = khList(), k = KH.i, p = list[k]; if(!p) return;
+  const [c1,c2] = khColor(p, k);
+  el.style.setProperty('--c1', c1); el.style.setProperty('--c2', c2);
+  el.querySelectorAll('.kh-item').forEach(it=>{ const d = (+it.dataset.k - k + list.length) % list.length; it.className = 'kh-item ' + (d===0?'on':d===1?'nx':d===list.length-1?'pv':'off'); });
+  el.querySelectorAll('.kh-slide').forEach(s=>s.classList.toggle('on', +s.dataset.k===k));
+  el.querySelectorAll('[data-khgo]').forEach(b=>b.classList.toggle('on', +b.dataset.khgo===k));
+  const nx = list[(k+1)%list.length], ni = $('#khNextImg'); if(ni && nx) ni.src = nx.img;
+  const ring = $('#khRing'); if(ring){ ring.style.animation = 'none'; void ring.getBoundingClientRect(); ring.style.animation = (REDUCED||KH.pause) ? 'none' : `khring ${KH.dur}ms linear forwards`; }
+}
+function khGo(k){ const n = khList().length; if(!n) return; KH.i = (k + n) % n; khPaint(); khSchedule(); }
+function khSchedule(){
+  clearTimeout(KH.timer);
+  if(REDUCED || KH.pause || khList().length < 2) return;
+  KH.timer = setTimeout(()=>{ if(!document.hidden && $('#kh')) khGo(KH.i + 1); else khSchedule(); }, KH.dur);
+}
+function khBind(){
+  const el = $('#kh'); if(!el) return;
+  khList().forEach(khAnalyse);
+  khPaint(); khSchedule();
+  const st = $('#khStage'); let x0 = null, moved = false;
+  st.addEventListener('pointerdown', e=>{ x0 = e.clientX; moved = false; });
+  st.addEventListener('pointermove', e=>{ if(x0!==null && Math.abs(e.clientX-x0) > 12) moved = true; });
+  st.addEventListener('pointerup', e=>{ if(x0===null) return; const dx = e.clientX - x0; x0 = null; if(Math.abs(dx) > 40){ khGo(KH.i + (dx<0?1:-1)); } });
+  st.addEventListener('click', e=>{ if(moved){ e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
+  el.addEventListener('mouseenter', ()=>{ KH.pause = true; khPaint(); clearTimeout(KH.timer); });
+  el.addEventListener('mouseleave', ()=>{ KH.pause = false; khPaint(); khSchedule(); });
+}
 function renderStore(){
   document.body.classList.add('storefront');
   $('.app').style.display = 'none'; $('#tabs').style.display = 'none';
   Object.keys(cart).forEach(pid=>{ const p = product(pid); const cap = p && p.preorder ? 10 : (p ? p.stock : 0); if(!p || cap<=0) delete cart[pid]; else if(cart[pid] > cap) cart[pid] = cap; });
   const sh = S.shop, open = sh.open !== false, n = cartCount();
-  document.title = `${sh.name} · Boutique`;
+  document.title = `${sh.name} · Le cadeau qui fait waouh`;
   const root = $('#store'); root.hidden = false;
   root.innerHTML = `<div class="sf">
-    <div class="sf-cover" aria-hidden="true"></div>
-    <div class="sf-head">
-      <div class="sf-logo" aria-hidden="true">${esc((sh.name||'B').charAt(0).toUpperCase())}</div>
-      <h1>${esc(sh.name)}</h1>
-      <div class="muted">${esc(sh.desc||'')}</div>
-      <div class="sf-meta"><span class="${open?'sf-open':''}">${open?'Ouvert, commandes acceptées':'Fermé pour le moment'}</span><span>Livraison à Dakar et en régions</span><span>${['Cash', phoneOk(sh.wave)?'Wave':'', phoneOk(sh.om)?'Orange Money':''].filter(Boolean).join(', ').replace(/, ([^,]*)$/, ' ou $1')}</span></div>
+    ${storeHero(open)}
+    <div class="sf-head kado">
+      <div class="sf-meta"><span class="${open?'sf-open':''}">${open?'Ouvert, commandes acceptées':'Fermé pour le moment'}</span><span>Livraison partout à Dakar</span><span>${['Cash', phoneOk(sh.wave)?'Wave':'', phoneOk(sh.om)?'Orange Money':''].filter(Boolean).join(', ').replace(/, ([^,]*)$/, ' ou $1')}</span></div>
+      <h2 class="sf-title">Tous nos cadeaux</h2>
     </div>
     ${open ? '' : '<div class="card" style="margin:16px 18px 0">La boutique ne prend pas de commandes en ce moment. Revenez bientôt.</div>'}
     <div class="sf-grid">${S.products.filter(p=>!p.archived).map(p=>storeCard(p, open)).join('')}</div>
-    <div class="sf-foot">Boutique propulsée par ${logo(false, 20)}</div>
+    <div class="sf-foot"><img src="kado-logo.svg" alt="kado" style="height:22px"><span>· boutique propulsée par</span> ${logo(false, 18)}</div>
   </div>
   ${n ? `<div class="cartbar"><button class="btn mango" id="cartBtn"><span>Voir le panier · ${n} article${n>1?'s':''}</span><b class="num">${F(cartTotal())}</b></button></div>` : ''}`;
+  khBind();
 }
 function readCo(){
   co.name = $('#c-name').value.trim(); co.phone = $('#c-phone').value.trim(); co.zoneId = $('#c-zone').value;
@@ -1135,6 +1211,8 @@ document.addEventListener('click', e=>{
   const t = e.target.closest('button, a'); if(!t) return;
   if(t.closest('#notif')) $('#notif').classList.remove('show');
   if(t.dataset.sview){ return openStoreProduct(t.dataset.sview); }
+  if(t.id==='khNext'){ khGo(KH.i + 1); return; }
+  if(t.dataset.khgo){ khGo(+t.dataset.khgo); return; }
   if(t.dataset.sinc){ const p = product(t.dataset.sinc); if(p){ cart[p.id] = Math.min(p.preorder ? 10 : p.stock, (cart[p.id]||0) + 1); if(t.hasAttribute('data-close-after')){ closeSheet(); toast('Ajouté au panier'); } renderStore(); } return; }
   if(t.dataset.sdec){ const k = t.dataset.sdec; cart[k] = (cart[k]||0) - 1; if(cart[k] <= 0) delete cart[k]; renderStore(); return; }
   if(t.id==='cartBtn') return openCheckout();
